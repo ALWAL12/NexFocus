@@ -17,19 +17,22 @@
           hours: {
             type: Number,
             notify: true,
-            value: 0
+            value: 0,
+            observer: '_calculateTimeRemaining'
           },
 
           minutes: {
             type: Number,
             notify: true,
-            value: 0
+            value: 0,
+            observer: '_calculateTimeRemaining'
           },
 
           seconds: {
             type: Number,
             notify: true,
-            value: 0
+            value: 0,
+            observer: '_calculateTimeRemaining'
           },
 
           millisecondsRemaining: {
@@ -50,7 +53,7 @@
           }
         },
 
-        attached: function() {
+        _calculateTimeRemaining: function() {
           var hoursToMillis = this.hours * HOUR_TO_MILLIS;
           var minutesToMillis = this.minutes * MINUTE_TO_MILLIS;
           var secondsToMillis = this.seconds * SECOND_TO_MILLIS;
@@ -72,6 +75,10 @@
           this.active = false;
         },
 
+        reset: function() {
+          this._calculateTimeRemaining();
+        },
+
         _updateTime: function() {
           if (this.active) {
             this.millisecondsRemaining = this.millisecondsRemaining - this.tickFrequency;
@@ -81,8 +88,6 @@
             } else {
               this.async(this._updateTime, this.tickFrequency);
             }
-
-            this._refreshTime();
           }
         },
 
@@ -90,12 +95,6 @@
           this.millisecondsRemaining = 0;
           this.active = false;
           this.fire('countdown-completed');
-        },
-
-        _refreshTime: function() {
-          this.seconds = Math.floor((this.millisecondsRemaining / SECOND_TO_MILLIS) % 60);
-          this.minutes = Math.floor((this.millisecondsRemaining / MINUTE_TO_MILLIS) % 60);
-          this.hours   = Math.floor((this.millisecondsRemaining / HOUR_TO_MILLIS) % 24);
         }
       });
     })();

@@ -1,0 +1,28 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="user-preference">
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'user-preference',
+
+        properties: {
+          userPreferences: {
+            type: Object,
+            readOnly: true,
+            notify: true,
+            value: function() {
+              return {
+                taskTime: 0,
+                breakTime: 0
+              }
+            }
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>
