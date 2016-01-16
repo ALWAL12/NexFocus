@@ -40,7 +40,7 @@
           tickFrequency: {
             type: Number,
             notify: true,
-            value: 100
+            value: 1000
           },
 
           active: {
@@ -61,6 +61,15 @@
           if (this.active) {
             this.async(this._updateTime, this.tickFrequency);
           }
+        },
+
+        start: function() {
+          this.active = true;
+          this.async(this._updateTime, this.tickFrequency);
+        },
+
+        stop: function() {
+          this.active = false;
         },
 
         _updateTime: function() {
