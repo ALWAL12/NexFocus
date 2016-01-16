@@ -84,9 +84,9 @@
         },
 
         _refreshTime: function() {
-          this.seconds = (this.millisecondsRemaining / SECOND_TO_MILLIS) % 60 ;
-          this.minutes = (this.millisecondsRemaining / MINUTE_TO_MILLIS) % 60;
-          this.hours   = (this.millisecondsRemaining / HOUR_TO_MILLIS) % 24;
+          this.seconds = Math.floor((this.millisecondsRemaining / SECOND_TO_MILLIS) % 60);
+          this.minutes = Math.floor((this.millisecondsRemaining / MINUTE_TO_MILLIS) % 60);
+          this.hours   = Math.floor((this.millisecondsRemaining / HOUR_TO_MILLIS) % 24);
         }
       });
     })();
