@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../countdown-timer/countdown-timer.html">
 <link rel="import" href="../users/user-preference.html">
@@ -9,39 +9,55 @@
 <dom-module id="main-app-view">
   <template>
     <style include="shared-styles">
+      :host {
+        display: @apply(--layout-horizontal);
+        align-items: center;
+        justify-content: center;
+      }
 
+      .timer-container {
+        display: @apply(--layout-vertical);
+        border: 2px solid var(--default-primary-color);
+        border-radius: 50%;
+        width: 300px;
+        height: 300px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .timer-container .time {
+        font-size: 48px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
     </style>
 
     <user-preference user-preferences="{{preferences}}"></user-preference>
 
-    <countdown-timer id="timer" minutes="[[preferences.taskTime]]" seconds="5"
+    <countdown-timer id="timer" minutes="[[preferences.taskTime]]"
                      active="{{active}}" milliseconds-remaining="{{timeRemaining}}"></countdown-timer>
 
-    <paper-material elevation="2">
-      <paper-input label="Task"></paper-input>
-
-      <div>{{_formatTime(timeRemaining)}}</div>
+    <div class="timer-container">
+      <paper-input label="Task" value="{{taskDetail}}" disabled="{{active}}"></paper-input>
+      <div class="time">{{_formatTime(timeRemaining)}}</div>
 
       <template is="dom-if" if="{{!active}}">
-        <paper-button raised on-tap="startTask">Start</paper-button>
+        <paper-fab icon="av:play-arrow" on-tap="startTask" disabled="{{!hasATask(taskDetail)}}"></paper-fab>
       </template>
 
       <template is="dom-if" if="{{active}}">
-        <paper-button raised on-tap="pauseTask">Pause</paper-button>
+        <paper-fab icon="av:pause" on-tap="pauseTask"></paper-fab>
       </template>
-
-      <template is="dom-if" if="{{isOnBreak}}">
-        <h2 style="color: red">BREAK TIME</h2> <!-- temporary -->
-      </template>
-    </paper-material>
+    </div>
 
     <paper-dialog id="taskCompletedDialog" modal>
       <h2>Task completed</h2>
       <div>How would you rate your performance?</div>
 
       <div class="buttons">
-        <paper-button on-tap="redoTask">Redo</paper-button>
-        <paper-button on-tap="takeABreak" autofocus>Take a break</paper-button>
+        <paper-button on-tap="_resetTimerForATask" dialog-dismiss>Cancel</paper-button>
+        <paper-button on-tap="redoTask" dialog-dismiss>Redo</paper-button>
+        <paper-button on-tap="takeABreak" dialog-dismiss autofocus>Take a break</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -59,12 +75,17 @@
 
         properties: {
           preferences: Object,
+          taskDetail: String,
 
           isOnBreak: {
             type: Boolean,
             notify: true,
             value: false
           }
+        },
+
+        hasATask: function(task) {
+          return task && task.length > 0;
         },
 
         startTask: function() {
@@ -81,7 +102,6 @@
         },
 
         redoTask: function() {
-          this.$.taskCompletedDialog.close();
           this._resetTimerForATask();
           this.startTask();
         },
@@ -90,18 +110,17 @@
           this.isOnBreak = true;
           this._resetTimerForABreak();
           this.$.timer.start();
-          this.$.taskCompletedDialog.close();
         },
 
         _resetTimerForATask: function() {
           this.$.timer.minutes = this.preferences.taskTime;
-          this.$.timer.seconds = 7;
+          this.$.timer.seconds = 0;
           this.$.timer.reset();
         },
 
         _resetTimerForABreak: function() {
           this.$.timer.minutes = this.preferences.breakTime;
-          this.$.timer.seconds = 8;
+          this.$.timer.seconds = 0;
           this.$.timer.reset();
         },
 
