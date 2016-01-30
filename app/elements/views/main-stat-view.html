@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../tasks/task-data.html">
+
+<dom-module id="main-stat-view">
+  <template>
+    <style>
+    </style>
+
+    <task-data id="taskData" tasks="{{tasks}}"></task-data>
+
+    <h2>Tasks history</h2>
+    <template is="dom-repeat" items="{{tasks}}" as="task">
+      <p>[<span>{{_formatDate(task.completedOn)}}</span>] [[task.name]] ([[task.rating]]/10)</p>
+    </template>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'main-stat-view',
+
+        properties: {
+          tasks: {
+            type: Array,
+            notify: true
+          }
+        },
+
+        completeTask: function(task) {
+          this.$.taskData.taskCompleted(task);
+        },
+
+        _formatDate: function(date) {
+          var day = this._formatNumber(date.getDate());
+          var month = this._formatNumber(date.getMonth() + 1); //months are zero-based
+          var year = this._formatNumber(date.getFullYear());
+          return day + '/' + month + '/' + year;
+        },
+
+        _formatNumber: function(number) {
+          if ( number < 10 ) {
+            return '0' + number;
+          } else {
+            return number;
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

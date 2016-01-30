@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="task-data">
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'task-data',
+
+        properties: {
+          tasks: {
+            type: Array,
+            notify: true,
+            value: function() {
+              return [];
+            }
+          }
+        },
+
+        taskCompleted: function(task) {
+          task['completedOn'] = new Date();
+          this.push('tasks', task);
+        }
+      });
+    })();
+  </script>
+</dom-module>

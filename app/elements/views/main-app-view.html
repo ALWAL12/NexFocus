@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../countdown-timer/countdown-timer.html">
 <link rel="import" href="../users/user-preference.html">
 
@@ -30,11 +31,15 @@
         margin-top: 20px;
         margin-bottom: 20px;
       }
+
+      paper-slider {
+        cursor: pointer;
+      }
     </style>
 
     <user-preference user-preferences="{{preferences}}"></user-preference>
 
-    <countdown-timer id="timer" minutes="[[preferences.taskTime]]"
+    <countdown-timer id="timer" seconds="3"
                      active="{{active}}" milliseconds-remaining="{{timeRemaining}}"></countdown-timer>
 
     <div class="timer-container">
@@ -52,10 +57,14 @@
 
     <paper-dialog id="taskCompletedDialog" modal>
       <h2>Task completed</h2>
-      <div>How would you rate your performance?</div>
+      <div>
+        How would you rate your performance?
+        <paper-slider id="taskRating" min="0" max="10" steps="1" value="5" pin></paper-slider>
+      </div>
+
 
       <div class="buttons">
-        <paper-button on-tap="_resetTimerForATask" dialog-dismiss>Cancel</paper-button>
+        <paper-button on-tap="cancel" dialog-dismiss>Cancel</paper-button>
         <paper-button on-tap="redoTask" dialog-dismiss>Redo</paper-button>
         <paper-button on-tap="takeABreak" dialog-dismiss autofocus>Take a break</paper-button>
       </div>
@@ -105,15 +114,30 @@
           this.$.taskCompletedDialog.open();
         },
 
+        cancel: function() {
+          this._resetTimerForATask();
+          this._sendTask();
+        },
+
         redoTask: function() {
           this._resetTimerForATask();
           this.startTask();
+          this._sendTask();
         },
 
         takeABreak: function() {
           this.isOnBreak = true;
           this._resetTimerForABreak();
           this.$.timer.start();
+          this._sendTask();
+        },
+
+        _sendTask: function() {
+          var completedTask = {
+            rating: this.$.taskRating.value,
+            name: this.taskDetail
+          };
+          this.fire('task-completed', {task: completedTask});
         },
 
         _resetTimerForATask: function() {

@@ -20,6 +20,12 @@
     console.log('Our app is ready to rock!');
   });
 
+  window.addEventListener('task-completed', function(e) {
+    var task = e.detail.task;
+    var statView = document.querySelector('#statView');
+    statView.completeTask(task);
+  });
+
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
     // imports are loaded and elements have been registered
