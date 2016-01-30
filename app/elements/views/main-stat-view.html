@@ -1,12 +1,29 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/google-chart/google-chart.html">
 <link rel="import" href="../tasks/task-data.html">
 
 <dom-module id="main-stat-view">
   <template>
     <style>
+      .chart-title {
+        margin-left: 200px;
+        margin-bottom: 0px;
+        padding-bottom: 0px;
+      }
     </style>
 
-    <task-data id="taskData" tasks="{{tasks}}"></task-data>
+    <task-data id="taskData"
+               tasks="{{tasks}}"
+               rating-per-day="{{ratingPerDay}}"
+               rating-per-hour="{{ratingPerHour}}"></task-data>
+
+    <h2 class="chart-title">Average rating per weekday</h2>
+    <google-chart options='{"width": 700, "height": 300, "backgroundColor": "transparent", "vAxis": {"minValue": 0, "maxValue": 10}}'
+                  data="{{_formatDataForRatingPerDay(ratingPerDay)}}"></google-chart>
+
+    <h2 class="chart-title">Average rating per hour</h2>
+    <google-chart options='{"width": 1000, "height": 300, "backgroundColor": "transparent", "vAxis": {"minValue": 0, "maxValue": 10}}'
+                  data="{{_formatDataForRatingPerHour(ratingPerHour)}}"></google-chart>
 
     <h2>Tasks history</h2>
     <template is="dom-repeat" items="{{tasks}}" as="task">
@@ -21,13 +38,6 @@
       Polymer({
         is: 'main-stat-view',
 
-        properties: {
-          tasks: {
-            type: Array,
-            notify: true
-          }
-        },
-
         completeTask: function(task) {
           this.$.taskData.taskCompleted(task);
         },
@@ -40,11 +50,32 @@
         },
 
         _formatNumber: function(number) {
-          if ( number < 10 ) {
+          if (number < 10) {
             return '0' + number;
           } else {
             return number;
           }
+        },
+
+        _formatDataForRatingPerDay: function(ratingPerDay) {
+          return [['Day', 'Rating'],
+                  ['Sunday', ratingPerDay.sunday.rating],
+                  ['Monday', ratingPerDay.monday.rating],
+                  ['Tuesday', ratingPerDay.tuesday.rating],
+                  ['Wednesday', ratingPerDay.wednesday.rating],
+                  ['Thursday', ratingPerDay.thursday.rating],
+                  ['Friday', ratingPerDay.friday.rating],
+                  ['Saturday', ratingPerDay.saturday.rating]];
+        },
+
+        _formatDataForRatingPerHour: function(ratingPerHour) {
+          var data = [['Hour', 'Rating']];
+          for (var i = 0; i < 24; ++i) {
+            var legend = (i === 0) ? '24h' : i + 'h';
+            var value = ratingPerHour[i].rating;
+            data.push([legend, value]);
+          }
+          return data;
         }
       });
     })();
