@@ -57,33 +57,28 @@
       <paper-scroll-header-panel drawer fixed>
 
         <paper-toolbar id="drawerToolbar">
-          <span class="menu-name">Menu</span>
+          <span class="menu-name">NexFocus</span>
         </paper-toolbar>
 
-        <paper-menu attr-for-selected="data-route" selected="[[route]]">
+        <paper-menu attr-for-selected="data-route" selected="{{route}}">
           <a data-route="home" href="{{baseUrl}}">
-            <iron-icon icon="home"></iron-icon>
-            <span>Home</span>
+            <iron-icon icon="image:timer"></iron-icon>
+            <span>Timer</span>
+          </a>
+
+          <a data-route="stats" href="/stats">
+            <iron-icon icon="timeline"></iron-icon>
+            <span>Statistics</span>
           </a>
         </paper-menu>
       </paper-scroll-header-panel>
 
-      <paper-scroll-header-panel main id="headerPanelMain" condenses keep-condensed-header>
-        <paper-toolbar id="mainToolbar" class="tall">
-          <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
-
-          <span class="space"></span>
-
-          <paper-icon-button icon="refresh"></paper-icon-button>
-          <paper-icon-button icon="search"></paper-icon-button>
-
-          <div class="middle middle-container">
-            <div class="app-name">NexFocus</div>
-          </div>
-
-          <div class="bottom bottom-container">
-            <div class="bottom-title">Achieve more in less time</div>
-          </div>
+      <paper-header-panel main id="headerPanelMain">
+        <paper-toolbar>
+          <paper-tabs attr-for-selected="data-route" selected="{{route}}">
+            <paper-tab data-route="home"><iron-icon icon="image:timer"></iron-icon></paper-tab>
+            <paper-tab data-route="stats"><iron-icon icon="timeline"></iron-icon></paper-tab>
+          </paper-tabs>
         </paper-toolbar>
 
         <div class="content">
@@ -91,9 +86,13 @@
             <section data-route="home">
               <main-app-view></main-app-view>
             </section>
+
+            <section data-route="stats">
+              <p>I will show some tasks.</p>
+            </section>
           </iron-pages>
         </div>
-      </paper-scroll-header-panel>
+      </paper-header-panel>
     </paper-drawer-panel>
   </template>
 
