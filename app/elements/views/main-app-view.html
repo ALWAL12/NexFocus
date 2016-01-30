@@ -39,7 +39,7 @@
 
     <user-preference user-preferences="{{preferences}}"></user-preference>
 
-    <countdown-timer id="timer" seconds="3"
+    <countdown-timer id="timer" minutes="{{preferences.taskTime}}"
                      active="{{active}}" milliseconds-remaining="{{timeRemaining}}"></countdown-timer>
 
     <div class="timer-container">
