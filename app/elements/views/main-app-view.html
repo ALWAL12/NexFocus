@@ -56,15 +56,14 @@
     </div>
 
     <paper-dialog id="taskCompletedDialog" modal>
-      <h2>Task completed</h2>
+      <h2><em>[[taskDetail]]</em> completed</h2>
       <div>
         How would you rate your performance?
         <paper-slider id="taskRating" min="0" max="10" steps="1" value="5" pin></paper-slider>
       </div>
 
-
       <div class="buttons">
-        <paper-button on-tap="cancel" dialog-dismiss>Cancel</paper-button>
+        <paper-button on-tap="cancel" dialog-dismiss>Close</paper-button>
         <paper-button on-tap="redoTask" dialog-dismiss>Redo</paper-button>
         <paper-button on-tap="takeABreak" dialog-dismiss autofocus>Take a break</paper-button>
       </div>
@@ -111,7 +110,12 @@
         },
 
         taskCompleted: function() {
-          this.$.taskCompletedDialog.open();
+          if (this.isOnBreak) {
+            this._resetTimerForATask();
+            this.isOnBreak = false;
+          } else {
+            this.$.taskCompletedDialog.open();
+          }
         },
 
         cancel: function() {
