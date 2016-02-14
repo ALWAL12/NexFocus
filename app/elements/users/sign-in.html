@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<dom-module id="sign-in">
+  <template>
+    <style include="shared-styles">
+      paper-dialog {
+        padding: 32px;
+      }
+
+      .google-sign-in {
+        display: inline-block;
+        background: #4285f4;
+        color: white;
+        width: 190px;
+        border-radius: 5px;
+        white-space: nowrap;
+      }
+
+      .google-sign-in:hover {
+        cursor: pointer;
+      }
+
+      .google-sign-in-icon {
+        /*background: url('/images/google-sign-in/g-normal.png') transparent 5px 50% no-repeat;*/
+        display: inline-block;
+        vertical-align: middle;
+        width: 42px;
+        height: 42px;
+        border-right: #2265d4 1px solid;
+      }
+
+      .google-sign-in-label {
+        display: inline-block;
+        vertical-align: middle;
+        padding-left: 42px;
+        padding-right: 42px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+    </style>
+
+    <paper-dialog modal opened="{{!user}}">
+      <h2>Oh hai! Please sign in</h2>
+      <div>
+        <div class="google-sign-in" tabindex="0" on-tap="signIn">
+          <span class="google-sign-in-icon"></span>
+          <span class="google-sign-in-label">Google</span>
+        </div>
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'sign-in',
+
+        properties: {
+          user: {
+            type: Object,
+            notify: true
+          }
+        },
+
+        signIn: function() {
+          this.fire('sign-in');
+        }
+      });
+    })();
+  </script>
+</dom-module>

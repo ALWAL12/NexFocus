@@ -12,8 +12,8 @@
       }
     </style>
 
-    <task-data id="taskData"
-               tasks="{{tasks}}"
+    <task-data id="taskData" location="https://nexfocus.firebaseio.com"
+               tasks="{{tasks}}" user="{{user}}"
                rating-per-day="{{ratingPerDay}}"
                rating-per-hour="{{ratingPerHour}}"></task-data>
 
@@ -27,7 +27,7 @@
 
     <h2>Tasks history</h2>
     <template is="dom-repeat" items="{{tasks}}" as="task">
-      <p>[<span>{{_formatDate(task.completedOn)}}</span>] [[task.name]] ([[task.rating]]/10)</p>
+      <p>[<span>{{_formatDate(task.timeCompleted)}}</span>] [[task.name]] ([[task.rating]]/10)</p>
     </template>
   </template>
 
@@ -38,14 +38,26 @@
       Polymer({
         is: 'main-stat-view',
 
+        properties: {
+          user: {
+            type: Object,
+            notify: true
+          }
+        },
+
         completeTask: function(task) {
           this.$.taskData.taskCompleted(task);
         },
 
+        signIn: function() {
+          this.$.taskData.signIn();
+        },
+
         _formatDate: function(date) {
-          var day = this._formatNumber(date.getDate());
-          var month = this._formatNumber(date.getMonth() + 1); //months are zero-based
-          var year = this._formatNumber(date.getFullYear());
+          var actualDate = new Date(date);
+          var day = this._formatNumber(actualDate.getDate());
+          var month = this._formatNumber(actualDate.getMonth() + 1); //months are zero-based
+          var year = this._formatNumber(actualDate.getFullYear());
           return day + '/' + month + '/' + year;
         },
 

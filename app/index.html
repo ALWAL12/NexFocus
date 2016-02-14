@@ -52,7 +52,6 @@
 <body unresolved>
   <span id="browser-sync-binding"></span>
   <template is="dom-bind" id="app">
-
     <paper-drawer-panel id="paperDrawerPanel">
       <paper-scroll-header-panel drawer fixed>
 
@@ -74,12 +73,20 @@
       </paper-scroll-header-panel>
 
       <paper-header-panel main id="headerPanelMain">
-        <paper-toolbar>
-          <paper-tabs attr-for-selected="data-route" selected="{{route}}">
-            <paper-tab data-route="home"><iron-icon icon="image:timer"></iron-icon></paper-tab>
-            <paper-tab data-route="stats"><iron-icon icon="timeline"></iron-icon></paper-tab>
-          </paper-tabs>
-        </paper-toolbar>
+        <div class="horizontal layout">
+          <paper-toolbar class="flex">
+            <paper-tabs class="flex" attr-for-selected="data-route" selected="{{route}}">
+              <paper-tab data-route="home"><iron-icon icon="image:timer"></iron-icon></paper-tab>
+              <paper-tab data-route="stats"><iron-icon icon="timeline"></iron-icon></paper-tab>
+            </paper-tabs>
+
+            <template is="dom-if" if="{{user}}">
+              <div class="profile">
+                <img src="{{user.google.cachedUserProfile.picture}}" alt="profile picture" />
+              </div>
+            </template>
+          </paper-toolbar>
+        </div>
 
         <div class="content">
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
@@ -88,12 +95,14 @@
             </section>
 
             <section data-route="stats">
-              <main-stat-view id="statView"></main-stat-view>
+              <main-stat-view id="statView" user="{{user}}"></main-stat-view>
             </section>
           </iron-pages>
         </div>
       </paper-header-panel>
     </paper-drawer-panel>
+
+    <sign-in user="{{user}}"></sign-in>
   </template>
 
   <!-- build:js scripts/app.js -->

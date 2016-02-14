@@ -26,6 +26,11 @@
     statView.completeTask(task);
   });
 
+  window.addEventListener('sign-in', function() {
+    var statView = document.querySelector('#statView');
+    statView.signIn();
+  });
+
   // Scroll page to top and expand header
   app.scrollPageToTop = function() {
     //app.$.headerPanelMain.scrollToTop(true);

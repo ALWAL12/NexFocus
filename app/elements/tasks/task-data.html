@@ -1,7 +1,30 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/firebase-element/firebase-collection.html">
+<link rel="import" href="../../bower_components/firebase-element/firebase-auth.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 
 <dom-module id="task-data">
+  <template>
+    <firebase-auth id="auth"
+                   location="{{location}}"
+                   ref="{{ref}}"
+                   provider="google"
+                   user="{{user}}"></firebase-auth>
 
+    <firebase-collection location="{{userLocation}}"
+                         data="{{firebaseTasks}}"
+                         on-firebase-value="_firebaseLoaded"></firebase-collection>
+
+    <!-- Backfill tasks from localstorage.
+         This prevents an initial flash while we're waiting to hear from Firebase,
+         and it lets the user see their old tasks if they start the app offline.
+         This SHOULD NOT write to Firebase. If the user has cleared their
+         localstorage, it should not nullify everything saved in Firebase. -->
+    <iron-localstorage name="nexfocus-tasks"
+                       on-iron-localstorage-load="_backupLoaded"
+                       value="{{backupTasks}}">
+    </iron-localstorage>
+  </template>
   <script>
     (function() {
       'use strict';
@@ -11,27 +34,16 @@
 
         properties: {
           tasks: {
-            type: Array,
+            notify: true
+          },
+
+          user: {
             notify: true,
-            value: function() {
-              return [
-                {name: 'Task 1', rating: 4, completedOn: new Date(2015, 11, 25, 12, 0, 0, 0)},
-                {name: 'Task 2', rating: 7, completedOn: new Date(2015, 11, 25, 12, 30, 0, 0)},
-                {name: 'Task 3', rating: 8, completedOn: new Date(2015, 11, 25, 13, 45, 0, 0)},
-                {name: 'Task 4', rating: 6, completedOn: new Date(2016, 0, 13, 14, 44, 0, 0)},
-                {name: 'Task 5', rating: 7, completedOn: new Date(2016, 0, 13, 14, 50, 0, 0)},
-                {name: 'Task 6', rating: 10, completedOn: new Date(2016, 0, 13, 15, 0, 0, 0)},
-                {name: 'Task 7', rating: 4, completedOn: new Date(2016, 0, 13, 18, 0, 0, 0)},
-                {name: 'Task 8', rating: 3, completedOn: new Date(2016, 0, 16, 23, 45, 0, 0)},
-                {name: 'Task 9', rating: 7, completedOn: new Date(2016, 0, 17, 20, 0, 0, 0)},
-                {name: 'Task 10', rating: 9, completedOn: new Date(2016, 0, 17, 20, 30, 0, 0)},
-                {name: 'Task 11', rating: 9, completedOn: new Date(2016, 0, 17, 20, 50, 0, 0)},
-                {name: 'Task 12', rating: 8, completedOn: new Date(2016, 0, 18, 8, 45, 0, 0)},
-                {name: 'Task 13', rating: 7, completedOn: new Date(2016, 0, 19, 10, 20, 0, 0)},
-                {name: 'Task 14', rating: 8, completedOn: new Date(2016, 0, 19, 10, 45, 0, 0)},
-                {name: 'Task 15', rating: 9, completedOn: new Date(2016, 0, 19, 13, 33, 0, 0)}
-              ];
-            }
+            observer: '_userChanged'
+          },
+
+          _firebaseConnected: {
+            value: false
           },
 
           ratingPerDay: {
@@ -48,7 +60,7 @@
         },
 
         taskCompleted: function(task) {
-          task.completedOn = new Date();
+          task.timeCompleted = new Date().getTime();
           this.push('tasks', task);
         },
 
@@ -68,7 +80,7 @@
 
           for (var i = 0; i < this.tasks.length; ++i) {
             var task = this.tasks[i];
-            var weekDay = task.completedOn.getDay();
+            var weekDay = new Date(task.timeCompleted).getDay();
 
             var average = this._calculateAverage(ratings.for(weekDay), task);
             ratings.for(weekDay).tasksCompleted = average.tasksCompleted;
@@ -86,7 +98,7 @@
 
           for (i = 0; i < this.tasks.length; ++i) {
             var task = this.tasks[i];
-            var hour = task.completedOn.getHours();
+            var hour = new Date(task.timeCompleted).getHours();
             ratings[hour] = this._calculateAverage(ratings[hour], task);
           }
 
@@ -102,6 +114,36 @@
 
         _roundHalf: function(number) {
           return Math.round(number * 2) / 2;
+        },
+
+        signIn: function() {
+          this.$.auth.login();
+        },
+
+        signOut: function() {
+          this.ref.unauth();
+          this.user = null;
+        },
+
+        // Setup user ref in firebase if auth succeeds
+        _userChanged: function(user) {
+          if (user) {
+            this.userLocation = [this.location, 'users', this.user.uid].join('/');
+          }
+        },
+
+        _firebaseLoaded: function() {
+          this._firebaseConnected = true;
+          this.tasks = this.firebaseTasks;
+          this.backupTasks = this.firebaseTasks;
+          this.linkPaths('firebaseTasks', 'tasks');
+          this.linkPaths('backupTasks', 'tasks');
+        },
+
+        _backupLoaded: function() {
+          if (!this._firebaseConnected) {
+            this.tasks = this.backupTasks.slice();
+          }
         }
       });
     })();
